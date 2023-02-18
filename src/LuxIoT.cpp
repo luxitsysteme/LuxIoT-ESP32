@@ -11,6 +11,17 @@
 #include "esp_https_ota.h"
 #include "esp_tls.h"
 
+#if CONFIG_IDF_TARGET_ESP32 // ESP32/PICO-D4
+#include "esp32/rom/rtc.h"
+#elif CONFIG_IDF_TARGET_ESP32S2
+#include "esp32s2/rom/rtc.h"
+#elif CONFIG_IDF_TARGET_ESP32C3
+#include "esp32c3/rom/rtc.h"
+#elif CONFIG_IDF_TARGET_ESP32S3
+#include "esp32s3/rom/rtc.h"
+#else 
+#error Target CONFIG_IDF_TARGET is not supported
+#endif
 
 static const char* TAG = "LuxIoT";
 
@@ -506,6 +517,8 @@ uint8_t LuxIoT::beginTelemetry(uint8_t includeStd){
         lux_json_doc["wifi"]["channel"] = WiFi.channel();
         lux_json_doc["wifi"]["bssid"] = WiFi.BSSIDstr();
         lux_json_doc["sw"]["sdk"] = ESP.getSdkVersion();
+        lux_json_doc["sw"]["rst_reason0"] = rtc_get_reset_reason(0);
+        lux_json_doc["sw"]["rst_reason0"] = rtc_get_reset_reason(1);
         lux_json_doc["hw"]["model"] = ESP.getChipModel();
         lux_json_doc["hw"]["revision"] = ESP.getChipRevision();
         lux_json_doc["hw"]["model"] = ESP.getCycleCount();
