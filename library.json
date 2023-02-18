@@ -24,8 +24,7 @@
     "license": "MIT",
     "homepage": "https://github.com/luxitsysteme/LuxIoT-ESP32",
     "dependencies": {
-      "ArduinoJson": "~6.20.1",
-      "SPIFFS": "~2.0.0"
+      "ArduinoJson": "~6.20.1"
     },
     "frameworks": "arduino",
     "platforms": "espressif32"
