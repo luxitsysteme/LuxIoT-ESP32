@@ -1,0 +1,31 @@
+{
+    "name": "LuxIoT",
+    "version": "0.1.0",
+    "description": "A \"Hello world\" program is a computer program that outputs \"Hello World\" (or some variant) on a display device",
+    "keywords": "lux, iot, cloud",
+    "repository":
+    {
+      "type": "git",
+      "url": "https://github.com/luxitsysteme/LuxIoT-ESP32.git"
+    },
+    "authors":
+    [
+      {
+        "name": "Lux IT Systeme UG (haftungsbeschränkt)",
+        "email": "support@lux-it-systeme.de",
+        "url": "https://lux-it-systeme.de/"
+      },
+      {
+        "name": "Daniel Lux",
+        "email": "dlux@lux-it-systeme.de",
+        "maintainer": true
+      }
+    ],
+    "license": "MIT",
+    "homepage": "https://github.com/luxitsysteme/LuxIoT-ESP32",
+    "dependencies": {
+      "ArduinoJson": "~6.20.1"
+    },
+    "frameworks": "arduino",
+    "platforms": "espressif32"
+  }
