@@ -521,7 +521,6 @@ uint8_t LuxIoT::beginTelemetry(uint8_t includeStd){
         lux_json_doc["sw"]["rst_reason1"] = rtc_get_reset_reason(1);
         lux_json_doc["hw"]["model"] = ESP.getChipModel();
         lux_json_doc["hw"]["revision"] = ESP.getChipRevision();
-        lux_json_doc["hw"]["model"] = ESP.getCycleCount();
         lux_json_doc["memory"]["flash_size"] = ESP.getFlashChipSize();
         lux_json_doc["memory"]["psram"]["size"] = ESP.getPsramSize();
         lux_json_doc["memory"]["psram"]["min_free"] = ESP.getMinFreePsram();
