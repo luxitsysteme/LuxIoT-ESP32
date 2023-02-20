@@ -82,11 +82,10 @@ LuxIoT::LuxIoT(
  * @return uint8_t returns whether the initialization was successful
  */
 uint8_t LuxIoT::begin(){
-    // Initialize Serial
-    Serial.begin(115200);
-    Serial.println("Hello from LuxIoT");
 
-    esp_log_level_set("*", ESP_LOG_DEBUG);
+    if(rtc_get_reset_reason(0) == RESET_REASON_CHIP_POWER_ON || rtc_get_reset_reason(1) == RESET_REASON_CHIP_POWER_ON){
+        ESP.restart();
+    }
 
     // initialize watchdog
     esp_err_t wdt_init_res = esp_task_wdt_init(mWatchdogTime, true);
@@ -120,11 +119,13 @@ uint8_t LuxIoT::beginWifi(const String &wifiSSID, const String &wifiPass){
     uint32_t startMillis = millis();
     if( lux_wifi_valid ) {
         ESP_LOGI(TAG, "There are wifi connection parameters cached, using it for fast wifi connectivity");
+        lux_wifi_valid = false; // invalidate in case something goes bad
         if (!_beginWifiInternalFast(wifiSSID, wifiPass, lux_wifi_channel, lux_wifi_bssid)){
             ESP_LOGE(TAG, "Fast connection not possible, remove valid flag and sleep");
             lux_wifi_valid = false;
             fallbackSleep();
         }
+        lux_wifi_valid = true;
 	}
 	else {
         ESP_LOGI(TAG, "There are no wifi connection parameters cached, using normal method.");
@@ -575,7 +576,7 @@ uint8_t LuxIoT::_beginWifiInternalNormal(const String &wifiSSID, const String &w
 uint8_t LuxIoT::_waitWifiConnection(){
     uint16_t retries = 0;
 	wl_status_t wifiStatus = WiFi.status();
-	while( wifiStatus != WL_CONNECTED && retries < 500) {
+	while( wifiStatus != WL_CONNECTED && retries < 1000) {
 		delay( 10 );
         retries++;
 		wifiStatus = WiFi.status();
