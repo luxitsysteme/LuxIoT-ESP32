@@ -94,6 +94,13 @@ uint8_t LuxIoT::begin(){
         fallbackSleep(); 
     }
 
+    wdt_init_res = esp_task_wdt_add(NULL); //add current thread to WDT watch
+    if (wdt_init_res != ESP_OK){
+        // This is usually called befor any wifi connection, therefore logging to serial and sleep. Should not be happening in the wild!
+        ESP_LOGE(TAG, "Failed to initialize wdt task.");
+        fallbackSleep(); 
+    }
+
     lux_json_doc.clear();
 
     uint8_t spiffres = SPIFFS.begin(true);
