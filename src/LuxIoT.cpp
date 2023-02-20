@@ -82,10 +82,9 @@ LuxIoT::LuxIoT(
  * @return uint8_t returns whether the initialization was successful
  */
 uint8_t LuxIoT::begin(){
-
-    if(rtc_get_reset_reason(0) == RESET_REASON_CHIP_POWER_ON || rtc_get_reset_reason(1) == RESET_REASON_CHIP_POWER_ON){
-        ESP.restart();
-    }
+    //if(rtc_get_reset_reason(0) == RESET_REASON_CHIP_POWER_ON || rtc_get_reset_reason(1) == RESET_REASON_CHIP_POWER_ON){
+    //    ESP.restart();
+    //}
 
     // initialize watchdog
     esp_err_t wdt_init_res = esp_task_wdt_init(mWatchdogTime, true);
@@ -237,6 +236,7 @@ uint8_t LuxIoT::ensureOtaFirmware(){
         if (ret == ESP_OK) {
             apiLog("Firmware update successful, rebooting!");
             spiffsWrite(LUX_FIRMWARE_FILE LUX_ETAG_SUFFIX, requestEtag);
+            lux_wifi_valid = false; // invalidate Wifi Credentials
             esp_restart();
         } else {
             apiLog("Firmware update was not successfull. Fallback Sleep!");
