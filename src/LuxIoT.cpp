@@ -396,6 +396,115 @@ uint8_t LuxIoT::apiGet(const String &prefix, const String &suffix, String &outpu
     return true;
 }
 
+uint8_t LuxIoT::apiGetBuffer(const String &prefix, const String &suffix, uint8_t* output, uint32_t outputMaxSize, uint32_t &outputSize, uint8_t useDeviceId){
+    String url = mBaseURL + prefix;
+    if(useDeviceId){
+        url += String(mDeviceId) + "/";
+    }
+    url += suffix;
+    ESP_LOGI(TAG, "Simple GET Request to %s", url.c_str());
+    mHttpClient.begin(url, (const char*)mCertStart);
+    uint16_t status = mHttpClient.GET();
+    uint8_t state = true;
+    if(status != 200){
+        //apiLog("Request GET %s returned %i", url, status);
+        ESP_LOGE(TAG, "Got %i from request...", status);
+        state = false;
+    }
+
+    if(state){
+        WiFiClient *stream = mHttpClient.getStreamPtr();
+        stream->setTimeout(1);
+        size_t length = mHttpClient.getSize();
+        outputSize = length;
+
+        size_t currentPos = 0;
+        size_t remainingBuffer = outputMaxSize;
+
+        while (mHttpClient.connected()){
+            size_t streamSize = stream->available();
+            if(streamSize) {
+                size_t bytesRead = stream->readBytes(output, remainingBuffer);
+
+                ESP_LOGI("TEST", "bytesRead: %i, remainingBuffer: %i, length: %i", bytesRead, remainingBuffer, length);
+
+                output += bytesRead;
+                remainingBuffer -= bytesRead;
+                length -= bytesRead;
+
+                if(length <= 0 || remainingBuffer <= 0){ // should not be < 0, but just in case
+                    break;
+                }
+            }
+            delay(5);
+        }
+    }else{
+        outputSize = 0;
+    }
+    
+    mHttpClient.end();
+    return state;
+}
+
+uint8_t LuxIoT::apiGetBuffer(const String &prefix, const String &suffix, uint8_t* output, uint32_t outputMaxSize, uint32_t &outputSize, const String &compareEtag, String &outputEtag, uint8_t useDeviceId){
+    String url = mBaseURL + prefix;
+    if(useDeviceId){
+        url += String(mDeviceId) + "/";
+    }
+    url += suffix;
+    ESP_LOGI(TAG, "Simple GET Request to %s", url.c_str());
+    mHttpClient.begin(url, (const char*)mCertStart);
+    const char* headerReq[1] = {"Etag"};
+    mHttpClient.collectHeaders(headerReq, 1);
+    mHttpClient.addHeader("If-None-Match", compareEtag);
+    uint16_t status = mHttpClient.GET();
+    uint8_t state = true;
+    if(status != 200){
+        //apiLog("Request GET %s returned %i", url, status);
+        ESP_LOGE(TAG, "Got %i from request...", status);
+        state = false;
+    }
+
+    if(mHttpClient.hasHeader("Etag")){
+        outputEtag = mHttpClient.header("Etag");
+        state = true;
+    }else{
+        state = false;
+    }
+
+    if(state){
+        WiFiClient *stream = mHttpClient.getStreamPtr();
+        stream->setTimeout(1);
+        size_t length = mHttpClient.getSize();
+        outputSize = length;
+
+        size_t currentPos = 0;
+        size_t remainingBuffer = outputMaxSize;
+
+        while (mHttpClient.connected()){
+            size_t streamSize = stream->available();
+            if(streamSize) {
+                size_t bytesRead = stream->readBytes(output, remainingBuffer);
+
+                output += bytesRead;
+                remainingBuffer -= bytesRead;
+                length -= bytesRead;
+
+                if(length <= 0 || remainingBuffer <= 0){ // should not be < 0, but just in case
+                    break;
+                }
+            }
+            delay(5);
+        }
+    }else{
+        outputSize = 0;
+        outputEtag = compareEtag;
+    }
+    
+    mHttpClient.end();
+    return state;
+}
+
 /**
  * @brief Simple HEAD Request on the API. Used to fetch Etag of a given ressource
  *        will assemble the URL:
@@ -442,6 +551,7 @@ uint8_t LuxIoT::apiHead(const String &prefix, const String &suffix, String &outp
     return state;
 }
 
+
 /**
  * @brief Simple POST request. 
  *        will assemble the URL:
@@ -476,7 +586,11 @@ uint8_t LuxIoT::apiPost(const String &prefix, const String &suffix, const String
         ESP_LOGE(TAG, "Got %i from request...", status);
         state = false;
     }
-    output = mHttpClient.getString();
+
+    if(state){
+        output = mHttpClient.getString();
+    }
+
     mHttpClient.end();
     return state;
 }

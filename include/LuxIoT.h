@@ -32,6 +32,10 @@ public:
 
     uint8_t apiGet(const String &prefix, const String &suffix, String &output, uint8_t useDeviceId);
     uint8_t apiGet(const String &prefix, const String &suffix, String &output, const String &compareEtag, String &outputEtag, uint8_t useDeviceId);
+    uint8_t apiGetBuffer(const String &prefix, const String &suffix, uint8_t* output, uint32_t outputMaxSize, uint32_t &outputSize, uint8_t useDeviceId);
+    uint8_t apiGetBuffer(const String &prefix, const String &suffix, uint8_t* output, uint32_t outputMaxSize, uint32_t &outputSize, const String &compareEtag, String &outputEtag, uint8_t useDeviceId);
+
+    
     uint8_t apiHead(const String &prefix, const String &suffix, String &outputEtag, uint8_t useDeviceId);
     uint8_t apiPost(const String &prefix, const String &suffix, const String &contentType, const String &input, String &output, uint8_t useDeviceId);
 
