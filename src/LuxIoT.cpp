@@ -718,7 +718,9 @@ void LuxIoT::regularSleep(uint64_t sleepS){
 	WiFi.disconnect(true);
 	WiFi.mode(WIFI_OFF);
 
-
+    if(this->mBeforeSleepCallback != nullptr){
+        ((void(*)())this->mBeforeSleepCallback)(); // function pointer magic
+    }
 
 	lux_last_runtime = millis() - mMillisStart;
 

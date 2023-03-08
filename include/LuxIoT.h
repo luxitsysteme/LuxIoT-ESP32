@@ -74,4 +74,6 @@ private:
 
     uint8_t* mCertStart;
     uint8_t* mCertEnd;
+
+    void* mBeforeSleepCallback;
 };
