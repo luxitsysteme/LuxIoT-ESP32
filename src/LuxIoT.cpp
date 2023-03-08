@@ -57,6 +57,8 @@ DynamicJsonDocument lux_json_doc(1024);   // temporary json document for parsing
  *                              choose a time that does not drain the battery very much (~15 minutes is a reasonable value)
  * @param watchdogTime          the watchdog timeout (in seconds) used. It should be long enough that your application usually terminates.
  *                              if feeding the watchdog while your application is running you can lower this value.
+ * @param beforeSleepCallback   a pointer to a function (signature: void function()) to call before going to sleep. You can use it to configure
+ *                              the device for minimum sleep current (e.g. isolate gpio pins; setting analog modes, ...)
  */
 LuxIoT::LuxIoT(
     const String &baseUrl,
@@ -64,13 +66,15 @@ LuxIoT::LuxIoT(
     const String &provisionToken,
     const uint32_t fallbackSleeptime,
     const uint32_t watchdogTime,
-    HTTPClient &httpClient) : 
+    HTTPClient &httpClient,
+    void (*beforeSleepCallback)() ) : 
         mBaseURL(baseUrl), 
         mProvisionSuffix(provisionSuffix), 
         mProvisionToken(provisionToken), 
         mFallbackSleeptime(fallbackSleeptime),
         mWatchdogTime(watchdogTime),
-        mHttpClient(httpClient){
+        mHttpClient(httpClient),
+        mBeforeSleepCallback(beforeSleepCallback){
     
     // TODO: Implement sanity checks for given values.
     mMillisStart = millis();
@@ -718,7 +722,9 @@ void LuxIoT::regularSleep(uint64_t sleepS){
 	WiFi.disconnect(true);
 	WiFi.mode(WIFI_OFF);
 
-
+    if(this->mBeforeSleepCallback != nullptr){
+        ((void(*)())this->mBeforeSleepCallback)(); // function pointer magic
+    }
 
 	lux_last_runtime = millis() - mMillisStart;
 
