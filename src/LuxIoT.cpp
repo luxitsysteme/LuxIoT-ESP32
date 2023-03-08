@@ -67,7 +67,7 @@ LuxIoT::LuxIoT(
     const uint32_t fallbackSleeptime,
     const uint32_t watchdogTime,
     HTTPClient &httpClient,
-    void* beforeSleepCallback) : 
+    void (*)() beforeSleepCallback) : 
         mBaseURL(baseUrl), 
         mProvisionSuffix(provisionSuffix), 
         mProvisionToken(provisionToken), 
