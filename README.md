@@ -23,7 +23,7 @@ HTTPClient httpClient;
 LuxIoT luxIoT(API_BASE_URL,
               API_PROVISION_SUFFIX,
               API_PROVISION_TOKEN,
-              300, 30, httpClient);
+              300, 30, httpClient, nullptr);
 
 void setup(){
     luxIoT.begin();
