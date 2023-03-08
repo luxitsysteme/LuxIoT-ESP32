@@ -14,7 +14,7 @@
 
 class LuxIoT{
 public:
-    LuxIoT(const String &baseUrl, const String &provisionSuffix, const String &provisionToken, const uint32_t fallbackSleeptime, const uint32_t watchdogTime, HTTPClient &httpClient);
+    LuxIoT(const String &baseUrl, const String &provisionSuffix, const String &provisionToken, const uint32_t fallbackSleeptime, const uint32_t watchdogTime, HTTPClient &httpClient, void* beforeSleepCallback);
     uint8_t begin();
     uint8_t beginWifi(const String &wifiSSID, const String &wifiPass);
 
