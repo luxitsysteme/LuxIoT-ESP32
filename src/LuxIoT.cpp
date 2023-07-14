@@ -67,7 +67,7 @@ LuxIoT::LuxIoT(
     const uint32_t fallbackSleeptime,
     const uint32_t watchdogTime,
     HTTPClient &httpClient,
-    void (*beforeSleepCallback)() ) : 
+    void (*beforeSleepCallback)(uint64_t sleepTime) ) : 
         mBaseURL(baseUrl), 
         mProvisionSuffix(provisionSuffix), 
         mProvisionToken(provisionToken), 
@@ -723,7 +723,7 @@ void LuxIoT::regularSleep(uint64_t sleepS){
 	WiFi.mode(WIFI_OFF);
 
     if(this->mBeforeSleepCallback != nullptr){
-        ((void(*)())this->mBeforeSleepCallback)(); // function pointer magic
+        ((void(*)(uint64_t))this->mBeforeSleepCallback)(sleepS); // function pointer magic
     }
 
 	lux_last_runtime = millis() - mMillisStart;
