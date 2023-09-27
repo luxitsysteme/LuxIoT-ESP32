@@ -373,6 +373,8 @@ uint8_t LuxIoT::apiGet(const String &prefix, const String &suffix, String &outpu
     url += suffix;
     ESP_LOGI(TAG, "Simple GET Request to %s", url.c_str());
     mHttpClient.begin(url, (const char*)mCertStart);
+    if (mApiToken.length() > 0)
+        mHttpClient.addHeader("Authorization", "Bearer " + mApiToken);
     uint16_t status = mHttpClient.GET();
     uint8_t state = true;
     if(status != 200){
@@ -408,6 +410,8 @@ uint8_t LuxIoT::apiGetBuffer(const String &prefix, const String &suffix, uint8_t
     url += suffix;
     ESP_LOGI(TAG, "Simple GET Request to %s", url.c_str());
     mHttpClient.begin(url, (const char*)mCertStart);
+    if (mApiToken.length() > 0)
+        mHttpClient.addHeader("Authorization", "Bearer " + mApiToken);
     uint16_t status = mHttpClient.GET();
     uint8_t state = true;
     if(status != 200){
@@ -461,6 +465,8 @@ uint8_t LuxIoT::apiGetBuffer(const String &prefix, const String &suffix, uint8_t
     const char* headerReq[1] = {"Etag"};
     mHttpClient.collectHeaders(headerReq, 1);
     mHttpClient.addHeader("If-None-Match", compareEtag);
+    if (mApiToken.length() > 0)
+        mHttpClient.addHeader("Authorization", "Bearer " + mApiToken);
     uint16_t status = mHttpClient.GET();
     uint8_t state = true;
     if(status != 200){
@@ -534,6 +540,8 @@ uint8_t LuxIoT::apiHead(const String &prefix, const String &suffix, String &outp
     mHttpClient.begin(url, (const char*)mCertStart);
     const char* headerReq[1] = {"Etag"};
     mHttpClient.collectHeaders(headerReq, 1);
+    if (mApiToken.length() > 0)
+        mHttpClient.addHeader("Authorization", "Bearer " + mApiToken);
     uint16_t status = mHttpClient.sendRequest("HEAD");
 
     uint8_t state = true;
@@ -582,6 +590,8 @@ uint8_t LuxIoT::apiPost(const String &prefix, const String &suffix, const String
 
     mHttpClient.begin(url, (const char*)mCertStart);
     mHttpClient.addHeader("Content-Type", contentType);
+    if (mApiToken.length() > 0)
+        mHttpClient.addHeader("Authorization", "Bearer " + mApiToken);
     uint16_t status = mHttpClient.POST(input);
     uint8_t state = true;
 
